@@ -1,8 +1,8 @@
 <?php
 $host = 'localhost';
-$usuario = 'root';
-$contrasena = '';
-$base_datos = 'tienda';
+$usuario = 'admin';
+$contrasena = 'root';
+$base_datos = 'ecommerce';
 
 $conn = new mysqli($host, $usuario, $contrasena, $base_datos);
 
