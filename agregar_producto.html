@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Producto</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .form-agregar {
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 32px 28px 24px 28px;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.13);
+        }
+        .form-agregar h2 {
+            color: #1976d2;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .form-agregar label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #333;
+        }
+        .form-agregar input, .form-agregar textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #bfcbe3;
+            font-size: 1rem;
+            margin-bottom: 14px;
+            background: #f7fafd;
+        }
+        .form-agregar textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .form-agregar button {
+            width: 100%;
+            background: #43a047;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 12px 0;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .form-agregar button:hover {
+            background: #388e3c;
+        }
+        .form-agregar .btn-pedido-nav {
+            margin: 0 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-agregar">
+        <h2>Agregar Producto</h2>
+        <form id="form-producto" action="php/registrar_producto.php" method="POST" onsubmit="return validarProducto()">
+            <label>Nombre:</label>
+            <input type="text" name="nombre" id="nombre_producto" required>
+            <label>Descripción:</label>
+            <textarea name="descripcion" id="descripcion_producto" required></textarea>
+            <label>Precio:</label>
+            <input type="number" name="precio" id="precio_producto" min="0" required>
+            <button type="submit">Registrar Producto</button>
+        </form>
+        <div style="text-align:center; margin-top:24px;">
+            <a href="index.php" class="btn-pedido-nav">Volver al inicio</a>
+        </div>
+    </div>
+    <script>
+    function validarProducto() {
+        if (document.getElementById('nombre_producto').value.trim() === '') {
+            alert('El nombre del producto es obligatorio.');
+            return false;
+        }
+        if (document.getElementById('descripcion_producto').value.trim() === '') {
+            alert('La descripción es obligatoria.');
+            return false;
+        }
+        if (parseFloat(document.getElementById('precio_producto').value) <= 0) {
+            alert('El precio debe ser mayor a 0.');
+            return false;
+        }
+        return true;
+    }
+    </script>
+</body>
+</html>

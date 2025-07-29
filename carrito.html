@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: #f5f7fa;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .carrito-container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 32px 24px 24px 24px;
+        }
+        .carrito-title {
+            font-size: 2.2rem;
+            color: #1976d2;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .carrito-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+        .carrito-table th, .carrito-table td {
+            padding: 12px 8px;
+            text-align: left;
+        }
+        .carrito-table th {
+            background: #e3eafc;
+            color: #1976d2;
+            font-weight: 600;
+        }
+        .carrito-table tr:nth-child(even) {
+            background: #f7fafd;
+        }
+        .carrito-total {
+            text-align: right;
+            font-size: 1.3rem;
+            color: #388e3c;
+            margin-bottom: 18px;
+        }
+        .carrito-vacio {
+            text-align: center;
+            color: #888;
+            font-size: 1.1rem;
+            margin: 40px 0;
+        }
+        .btn-volver {
+            display: inline-block;
+            background: #1976d2;
+            color: #fff;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .btn-volver:hover {
+            background: #1251a3;
+        }
+        @media (max-width: 600px) {
+            .carrito-container { padding: 12px 2px; }
+            .carrito-title { font-size: 1.3rem; }
+            .carrito-table th, .carrito-table td { padding: 7px 2px; font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="carrito-container">
+        <div class="carrito-title">🛒 Tu Carrito de Compras</div>
+        <div id="carrito-detalle"></div>
+        <div class="carrito-total" id="carrito-total"></div>
+        <a href="index.html" class="btn-volver">&larr; Seguir comprando</a>
+    </div>
+    <script>
+    // Cargar productos del carrito desde la sesión PHP
+    fetch('php/carrito_productos.php')
+        .then(res => res.json())
+        .then(data => {
+            const contenedor = document.getElementById('carrito-detalle');
+            const totalDiv = document.getElementById('carrito-total');
+            if (!data.productos || data.productos.length === 0) {
+                contenedor.innerHTML = '<div class="carrito-vacio">Tu carrito está vacío.</div>';
+                totalDiv.textContent = '';
+                return;
+            }
+            let total = 0;
+            let tabla = `<table class='carrito-table'><thead><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Subtotal</th><th></th></tr></thead><tbody>`;
+            data.productos.forEach(p => {
+                const precio = parseFloat(p.descuento && p.descuento > 0 ? (p.precio * (1 - p.descuento/100)) : p.precio);
+                const subtotal = precio * p.cantidad;
+                total += subtotal;
+                tabla += `<tr>
+                    <td>${p.nombre}</td>
+                    <td>${precio.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>
+                    <td>${p.cantidad}</td>
+                    <td>${subtotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>
+                    <td><button class='btn-eliminar' data-id='${p.id}' title='Eliminar del carrito' style='background:#d32f2f;color:#fff;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;'>✕</button></td>
+                </tr>`;
+            });
+            tabla += '</tbody></table>';
+            contenedor.innerHTML = tabla;
+            totalDiv.textContent = 'Total: ' + total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+            document.querySelectorAll('.btn-eliminar').forEach(btn => {
+                btn.onclick = function() {
+                    const id = this.getAttribute('data-id');
+                    fetch('php/eliminar_del_carrito.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'producto_id=' + encodeURIComponent(id)
+                    })
+                    .then(res => res.json())
+                    .then(() => location.reload());
+                };
+            });
+        });
+    </script>
+</body>
+</html>
